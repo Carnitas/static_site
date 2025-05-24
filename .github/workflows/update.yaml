@@ -1,0 +1,46 @@
+name: Update dependencies
+
+on:
+  schedule:
+    - cron: 0 18 * * 5  # Every Friday at 9am/10am MT
+  workflow_dispatch:
+
+jobs:
+  date:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Store current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d_%k-%M-%S')" >> "$GITHUB_OUTPUT"
+    outputs:
+      date: ${{ steps.date.outputs.date }}
+
+  update:
+    runs-on: ubuntu-latest
+    needs: date
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install poetry
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cache pre-commit environment
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - run: poetry install --sync --no-interaction -vvv
+      - run: poetry update --no-interaction -vvv
+      - run: poetry run pre-commit autoupdate
+
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: ':arrow_up: Update dependencies'
+          title: ':arrow_up: Update dependencies'
+          branch: update-python-${{ needs.date.outputs.date }}
+          base: main
+          reviewers: jgopel
+          labels: enhancement

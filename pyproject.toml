@@ -1,0 +1,80 @@
+[project]
+name = "your-module"
+version = "0.1.0"
+description = ""
+authors = [
+  {name = "Your Name", email = "you@example.com"},
+]
+readme = "README.md"
+requires-python = "^3.12"
+dependencies = []
+
+[tool.poetry.group.dev.dependencies]
+autoflake = ">=2.3.1"
+black = ">=24.8.0"
+coverage = ">=7.6.1"
+flake8 = ">=7.1.1"
+flake8-2020 = ">=1.8.1"
+flake8-bugbear = ">=24.8.19"
+flake8-builtins = ">=2.5.0"
+flake8-comprehensions = ">=3.15.0"
+flake8-encodings = ">=0.5.1"
+flake8-implicit-str-concat = ">=0.4.0"
+flake8-new-union-types = ">=0.4.1"
+flake8-pep585 = ">=0.1.7"
+flake8-simplify = ">=0.21.0"
+flake8-tidy-imports = ">=4.10.0"
+isort = ">=5.13.2"
+mypy = ">=1.11.2"
+pre-commit = ">=3.8.0"
+pylint = ">=3.2.7"
+pytest = ">=8.3.2"
+pytest-asyncio = ">=0.24.0"
+pytest-random-order = ">=1.1.1"
+pytest-socket = ">=0.7.0"
+
+[tool.black]
+line-length = 88
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "tests/*",
+]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+skip_covered = true
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = [
+  "tests.*",
+]
+disallow_untyped_defs = false
+disallow_untyped_decorators = false
+
+[tool.pytest.ini_options]
+addopts = [
+  "--disable-socket",
+  "--allow-unix-socket",
+  "--strict-markers",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
