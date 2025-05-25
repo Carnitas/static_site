@@ -30,7 +30,7 @@ class TestTextNode(unittest.TestCase):
     def test_repr(self) -> None:
         node = TextNode("This is a text node", TextType.BOLD, url="https://example.com")
         expected_repr = (
-            "TextNode "
+            "TextNode"
             "(text='This is a text node', text_type=<TextType.BOLD: 'bold'>, "
             "url='https://example.com')"
         )
