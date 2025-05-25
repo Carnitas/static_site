@@ -40,6 +40,7 @@ repos:
     rev: v0.16.0
     hooks:
       - id: yamlfmt
+
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
     rev: v2.14.0
     hooks:
@@ -55,11 +56,11 @@ repos:
       - id: mdformat
         args:
           - --wrap=80
-
-  - repo: https://github.com/lovesegfault/beautysh
-    rev: v6.2.1
-    hooks:
-      - id: beautysh
+  # Doesn't work with Python 3.12
+  # - repo: https://github.com/lovesegfault/beautysh
+  #   rev: v6.2.1
+  #   hooks:
+  #     - id: beautysh
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
