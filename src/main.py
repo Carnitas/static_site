@@ -1,7 +1,7 @@
 from textnode import TextNode
 
 
-def main() -> None:
+def main() -> None: # pragma: no cover
     first_text_node = TextNode("This is some text", "link", "https://example.com")
     print(first_text_node)
 

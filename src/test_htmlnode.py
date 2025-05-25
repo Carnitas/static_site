@@ -28,3 +28,9 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(tag="div", props={})
         expected_html = ""
         self.assertEqual(node.props_to_html(), expected_html)
+
+    def test_to_html_not_implemented(self) -> None:
+        """Test that to_html raises NotImplementedError."""
+        node = HTMLNode(tag="div")
+        with self.assertRaises(NotImplementedError):
+            node.to_html()
