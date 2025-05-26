@@ -1,12 +1,14 @@
 from enum import Enum
 
+from htmlnode import HTMLNode, LeafNode
+
 
 class TextType(Enum):
     """
     Enum representing different types of text content.
     """
 
-    NORMAL = "normal"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -21,7 +23,7 @@ class TextNode:
 
     def __init__(
         self,
-        text: str | None = None,
+        text: str,
         text_type: TextType | str | None = None,
         url: str | None = None,
     ):
@@ -40,3 +42,33 @@ class TextNode:
 
     def __repr__(self) -> str:
         return f"TextNode(text={self.text!r}, text_type={self.text_type!r}, url={self.url!r})"
+
+
+def text_node_to_html_node(node: TextNode) -> "HTMLNode":
+    """
+    Convert a TextNode to an HTMLNode.
+
+    :param node: The TextNode to convert.
+    :return: An HTMLNode representation of the TextNode.
+    """
+    match node.text_type:
+        case TextType.TEXT | None:
+            return LeafNode(tag="", value=node.text)
+        case TextType.BOLD:
+            return LeafNode(tag="b", value=node.text)
+        case TextType.ITALIC:
+            return LeafNode(tag="i", value=node.text)
+        case TextType.CODE:
+            return LeafNode(tag="code", value=node.text)
+        case TextType.LINK:
+            if not node.url:
+                raise ValueError("Link text nodes must have a URL.")
+            return LeafNode(tag="a", value=node.text, props={"href": node.url})
+        case TextType.IMAGES:
+            if not node.url:
+                raise ValueError("Image text nodes must have a URL.")
+            return LeafNode(
+                tag="img", value=node.text, props={"src": node.url, "alt": node.text}
+            )
+        case _:
+            raise ValueError(f"Unknown text type: {node.text_type}")
