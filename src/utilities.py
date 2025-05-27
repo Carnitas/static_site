@@ -43,3 +43,51 @@ def extract_markdown_links(text: str) -> list[tuple[str, str]]:
     """
     pattern = r"\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
+
+
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    """
+    Split text nodes by markdown images and convert them to TextNode objects.
+
+    :param old_nodes: List of TextNode objects to be split.
+    :return: A list of new TextNode objects with images.
+    """
+    new_nodes = []
+    for node in old_nodes:
+        parts = extract_markdown_images(node.text)
+        if not parts:
+            new_nodes.append(node)
+            continue
+
+        text_parts = re.split(r"!\[.*?\]\(.*?\)", node.text)
+        for i, part in enumerate(text_parts):
+            if part.strip():
+                new_nodes.append(TextNode(part.strip(), TextType.TEXT))
+            if i < len(parts):
+                image_text, url = parts[i]
+                new_nodes.append(TextNode(image_text, TextType.IMAGES, url))
+    return new_nodes
+
+
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    """
+    Split text nodes by markdown links and convert them to TextNode objects.
+
+    :param old_nodes: List of TextNode objects to be split.
+    :return: A list of new TextNode objects with links.
+    """
+    new_nodes = []
+    for node in old_nodes:
+        parts = extract_markdown_links(node.text)
+        if not parts:
+            new_nodes.append(node)
+            continue
+
+        text_parts = re.split(r"\[.*?\]\(.*?\)", node.text)
+        for i, part in enumerate(text_parts):
+            if part.strip():
+                new_nodes.append(TextNode(part.strip(), TextType.TEXT))
+            if i < len(parts):
+                link_text, url = parts[i]
+                new_nodes.append(TextNode(link_text, TextType.LINK, url))
+    return new_nodes
