@@ -1,3 +1,5 @@
+import re
+
 from textnode import TextNode, TextType
 
 
@@ -19,3 +21,25 @@ def split_nodes_delimiter(
             if part.strip():  # Avoid empty parts
                 new_nodes.append(TextNode(part.strip(), text_type))
     return new_nodes
+
+
+def extract_markdown_images(text: str) -> list[tuple[str, str]]:
+    """
+    Extract image URLs from a markdown text.
+
+    :param text: The markdown text containing image URLs.
+    :return: A list of image URLs found in the text.
+    """
+    pattern = r"!\[(.*?)\]\((.*?)\)"
+    return re.findall(pattern, text)
+
+
+def extract_markdown_links(text: str) -> list[tuple[str, str]]:
+    """
+    Extract links from a markdown text.
+
+    :param text: The markdown text containing links.
+    :return: A list of links found in the text.
+    """
+    pattern = r"\[(.*?)\]\((.*?)\)"
+    return re.findall(pattern, text)
