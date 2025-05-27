@@ -19,9 +19,10 @@ def split_nodes_delimiter(
         parts = node.text.split(delimiter)
         if len(parts) == 1:
             new_nodes.append(node)
-            continue
         if len(parts) > 1:
             for i, part in enumerate(parts):
+                if not part.strip():
+                    continue
                 if not i % 2:
                     new_nodes.append(TextNode(part, TextType.TEXT))
                 else:

@@ -238,15 +238,11 @@ class TestUtilities(unittest.TestCase):
         nodes = text_to_textnodes(text)
         self.assertListEqual(
             [
-                TextNode("", TextType.TEXT),
                 TextNode("bold1", TextType.BOLD),
                 TextNode(" normal ", TextType.TEXT),
                 TextNode("bold2", TextType.BOLD),
-                TextNode(" ", TextType.TEXT),
                 TextNode("italic1", TextType.ITALIC),
-                TextNode(" ", TextType.TEXT),
                 TextNode("italic2", TextType.ITALIC),
-                TextNode("", TextType.TEXT),
             ],
             nodes,
         )

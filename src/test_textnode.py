@@ -36,6 +36,11 @@ class TestTextNode(unittest.TestCase):
         )
         self.assertEqual(repr(node), expected_repr)
 
+    def test_repr_without_url(self) -> None:
+        node = TextNode("This is a text node", TextType.BOLD)
+        expected_repr = "TextNode('This is a text node', TextType.BOLD)"
+        self.assertEqual(repr(node), expected_repr)
+
     def test_text_to_html_text(self) -> None:
         node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
