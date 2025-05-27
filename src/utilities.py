@@ -17,9 +17,15 @@ def split_nodes_delimiter(
     new_nodes = []
     for node in old_nodes:
         parts = node.text.split(delimiter)
-        for part in parts:
-            if part.strip():  # Avoid empty parts
-                new_nodes.append(TextNode(part.strip(), text_type))
+        if len(parts) == 1:
+            new_nodes.append(node)
+            continue
+        if len(parts) > 1:
+            for i, part in enumerate(parts):
+                if not i % 2:
+                    new_nodes.append(TextNode(part, TextType.TEXT))
+                else:
+                    new_nodes.append(TextNode(part, text_type))
     return new_nodes
 
 
@@ -62,10 +68,10 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
         text_parts = re.split(r"!\[.*?\]\(.*?\)", node.text)
         for i, part in enumerate(text_parts):
             if part.strip():
-                new_nodes.append(TextNode(part.strip(), TextType.TEXT))
+                new_nodes.append(TextNode(part, TextType.TEXT))
             if i < len(parts):
                 image_text, url = parts[i]
-                new_nodes.append(TextNode(image_text, TextType.IMAGES, url))
+                new_nodes.append(TextNode(image_text, TextType.IMAGE, url))
     return new_nodes
 
 
@@ -86,8 +92,24 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
         text_parts = re.split(r"\[.*?\]\(.*?\)", node.text)
         for i, part in enumerate(text_parts):
             if part.strip():
-                new_nodes.append(TextNode(part.strip(), TextType.TEXT))
+                new_nodes.append(TextNode(part, TextType.TEXT))
             if i < len(parts):
                 link_text, url = parts[i]
                 new_nodes.append(TextNode(link_text, TextType.LINK, url))
     return new_nodes
+
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    """
+    Convert a plain text string into a list of TextNode objects.
+
+    :param text: The plain text to convert.
+    :return: A list of TextNode objects with appropriate TextType and URLs.
+    """
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes

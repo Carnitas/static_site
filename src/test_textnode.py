@@ -31,7 +31,7 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a text node", TextType.BOLD, url="https://example.com")
         expected_repr = (
             "TextNode"
-            "('This is a text node', <TextType.BOLD: 'bold'>, "
+            "('This is a text node', TextType.BOLD, "
             "'https://example.com')"
         )
         self.assertEqual(repr(node), expected_repr)
@@ -74,7 +74,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_text_to_html_images(self) -> None:
         node = TextNode(
-            "This is an image", TextType.IMAGES, url="https://example.com/image.png"
+            "This is an image", TextType.IMAGE, url="https://example.com/image.png"
         )
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
@@ -83,7 +83,7 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(html_node.props.get("alt"), "This is an image")
 
     def test_text_to_html_empty_image(self) -> None:
-        node = TextNode("This is an empty image", TextType.IMAGES, url="")
+        node = TextNode("This is an empty image", TextType.IMAGE, url="")
         with self.assertRaises(ValueError):
             text_node_to_html_node(node)
 

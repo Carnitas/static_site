@@ -13,7 +13,7 @@ class TextType(Enum):
     ITALIC = "italic"
     CODE = "code"
     LINK = "link"
-    IMAGES = "images"
+    IMAGE = "image"
 
 
 class TextNode:
@@ -41,7 +41,9 @@ class TextNode:
         )
 
     def __repr__(self) -> str:
-        return f"TextNode({self.text!r}, {self.text_type!r}, {self.url!r})"
+        if self.url:
+            return f"TextNode({self.text!r}, {self.text_type}, {self.url!r})"
+        return f"TextNode({self.text!r}, {self.text_type})"
 
 
 def text_node_to_html_node(node: TextNode) -> "HTMLNode":
@@ -64,7 +66,7 @@ def text_node_to_html_node(node: TextNode) -> "HTMLNode":
             if not node.url:
                 raise ValueError("Link text nodes must have a URL.")
             return LeafNode(tag="a", value=node.text, props={"href": node.url})
-        case TextType.IMAGES:
+        case TextType.IMAGE:
             if not node.url:
                 raise ValueError("Image text nodes must have a URL.")
             return LeafNode(

@@ -7,6 +7,7 @@ from utilities import (
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 
@@ -27,27 +28,12 @@ class TestUtilities(unittest.TestCase):
         new_nodes = split_nodes_delimiter(old_nodes, delimiter, text_type)
 
         assert len(new_nodes) == 6
-        assert new_nodes[0] == TextNode("This is text with a", text_type)
-        assert new_nodes[1] == TextNode("code block", text_type)
-        assert new_nodes[2] == TextNode("word", text_type)
-        assert new_nodes[3] == TextNode("Another", text_type)
-        assert new_nodes[4] == TextNode("example", text_type)
-        assert new_nodes[5] == TextNode("of splitting", text_type)
-
-    def test_empty_parts(self) -> None:
-        """
-        Test that empty parts are not included in the new nodes.
-        """
-        old_nodes = [TextNode("This is text with a ` ` missing part", TextType.TEXT)]
-        delimiter = "`"
-        text_type = TextType.CODE
-
-        new_nodes = split_nodes_delimiter(old_nodes, delimiter, text_type)
-
-        assert len(new_nodes) == 2
-        assert new_nodes[0] == TextNode("This is text with a", text_type)
-        # assert new_nodes[1] == TextNode(" ", text_type)  # This should be empty
-        assert new_nodes[1] == TextNode("missing part", text_type)
+        assert new_nodes[0] == TextNode("This is text with a ", TextType.TEXT)
+        assert new_nodes[1] == TextNode("code block", TextType.CODE)
+        assert new_nodes[2] == TextNode(" word", TextType.TEXT)
+        assert new_nodes[3] == TextNode("Another ", TextType.TEXT)
+        assert new_nodes[4] == TextNode("example", TextType.CODE)
+        assert new_nodes[5] == TextNode(" of splitting", TextType.TEXT)
 
     def test_extract_markdown_images(self) -> None:
         matches = extract_markdown_images(
@@ -62,55 +48,58 @@ class TestUtilities(unittest.TestCase):
         self.assertListEqual([("link", "https://example.com")], matches)
 
     def test_split_images(self) -> None:
+        """Test the split_nodes_image function with a single node containing multiple images."""
         node = TextNode(
-            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) \
-                and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) "
+            "and another ![second image](https://i.imgur.com/3elNhQu.png)",
             TextType.TEXT,
         )
         new_nodes = split_nodes_image([node])
         self.assertListEqual(
             [
-                TextNode("This is text with an", TextType.TEXT),
-                TextNode("image", TextType.IMAGES, "https://i.imgur.com/zjjcJKZ.png"),
-                TextNode("and another", TextType.TEXT),
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
                 TextNode(
-                    "second image", TextType.IMAGES, "https://i.imgur.com/3elNhQu.png"
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
                 ),
             ],
             new_nodes,
         )
 
     def test_split_nodes_link(self) -> None:
+        """Test the split_nodes_link function with a single node containing multiple links."""
         node = TextNode(
-            "This is text with a [link](https://example.com) \
-                and another [second link](https://example.org)",
+            "This is text with a [link](https://example.com) "
+            "and another [second link](https://example.org)",
             TextType.TEXT,
         )
         new_nodes = split_nodes_link([node])
         self.assertListEqual(
             [
-                TextNode("This is text with a", TextType.TEXT),
+                TextNode("This is text with a ", TextType.TEXT),
                 TextNode("link", TextType.LINK, "https://example.com"),
-                TextNode("and another", TextType.TEXT),
+                TextNode(" and another ", TextType.TEXT),
                 TextNode("second link", TextType.LINK, "https://example.org"),
             ],
             new_nodes,
         )
 
     def test_split_nodes_image(self) -> None:
+        """Test the split_nodes_image function with a single node containing multiple images."""
         node = TextNode(
-            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) \
-                and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) "
+            "and another ![second image](https://i.imgur.com/3elNhQu.png)",
             TextType.TEXT,
         )
         new_nodes = split_nodes_image([node])
         self.assertListEqual(
             [
-                TextNode("This is text with an", TextType.TEXT),
-                TextNode("image", TextType.IMAGES, "https://i.imgur.com/zjjcJKZ.png"),
-                TextNode("and another", TextType.TEXT),
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
                 TextNode(
-                    "second image", TextType.IMAGES, "https://i.imgur.com/3elNhQu.png"
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
                 ),
             ],
             new_nodes,
@@ -131,3 +120,133 @@ class TestUtilities(unittest.TestCase):
         node = TextNode("This is text with no images", TextType.TEXT)
         new_nodes = split_nodes_image([node])
         self.assertListEqual([node], new_nodes)
+
+    def test_text_to_textnodes_plain_text(self) -> None:
+        """
+        Test text_to_textnodes with plain text (no formatting).
+        """
+        text = "This is a simple sentence."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [TextNode("This is a simple sentence.", TextType.TEXT)], nodes
+        )
+
+    def test_text_to_textnodes_bold(self) -> None:
+        """
+        Test text_to_textnodes with bold formatting.
+        """
+        text = "This is **bold** text."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" text.", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_italic(self) -> None:
+        """
+        Test text_to_textnodes with italic formatting.
+        """
+        text = "This is _italic_ text."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" text.", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_code(self) -> None:
+        """
+        Test text_to_textnodes with code formatting.
+        """
+        text = "This is `code` text."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" text.", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_image(self) -> None:
+        """
+        Test text_to_textnodes with an image.
+        """
+        text = "Here is an image: ![alt](http://img.com/img.png)"
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Here is an image: ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "http://img.com/img.png"),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_link(self) -> None:
+        """
+        Test text_to_textnodes with a link.
+        """
+        text = "Here is a [link](http://example.com)."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Here is a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "http://example.com"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_mixed(self) -> None:
+        """
+        Test text_to_textnodes with mixed formatting.
+        """
+        text = (
+            "This is **bold** and _italic_ and `code` and ![img](url) and [link](url2)."
+        )
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("img", TextType.IMAGE, "url"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "url2"),
+                TextNode(".", TextType.TEXT),
+            ],
+            nodes,
+        )
+
+    def test_text_to_textnodes_multiple_same_format(self) -> None:
+        """
+        Test text_to_textnodes with multiple bold and italic segments.
+        """
+        text = "**bold1** normal **bold2** _italic1_ _italic2_"
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("", TextType.TEXT),
+                TextNode("bold1", TextType.BOLD),
+                TextNode(" normal ", TextType.TEXT),
+                TextNode("bold2", TextType.BOLD),
+                TextNode(" ", TextType.TEXT),
+                TextNode("italic1", TextType.ITALIC),
+                TextNode(" ", TextType.TEXT),
+                TextNode("italic2", TextType.ITALIC),
+                TextNode("", TextType.TEXT),
+            ],
+            nodes,
+        )
