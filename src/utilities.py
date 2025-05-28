@@ -108,9 +108,38 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     :return: A list of TextNode objects with appropriate TextType and URLs.
     """
     nodes = [TextNode(text, TextType.TEXT)]
-    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
-    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    delimiter_map = {
+        "**": TextType.BOLD,
+        "_": TextType.ITALIC,
+        "`": TextType.CODE,
+    }
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
+    for delimiter, text_type in delimiter_map.items():
+        nodes = split_nodes_delimiter(nodes, delimiter, text_type)
+
     return nodes
+
+
+def markdown_to_blocks(markdown: str) -> list[str]:
+    """
+    Convert markdown text to a list of block strings
+    :param markdown: The markdown text to convert.
+    :return: A list of block strings.
+    """
+    blocks = []
+    lines = markdown.splitlines()
+    current_block: list[str] = []
+
+    for line in lines:
+        if not line.strip():
+            if current_block:
+                blocks.append("\n".join(current_block))
+                current_block = []
+        else:
+            current_block.append(line)
+
+    if current_block:
+        blocks.append("\n".join(current_block))
+
+    return blocks
