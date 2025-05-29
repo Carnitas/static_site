@@ -46,7 +46,7 @@ class TextNode:
         return f"TextNode({self.text!r}, {self.text_type})"
 
 
-def text_node_to_html_node(node: TextNode) -> "HTMLNode":
+def text_node_to_html_node(node: TextNode) -> HTMLNode:
     """
     Convert a TextNode to an HTMLNode.
 

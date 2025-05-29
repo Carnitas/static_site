@@ -128,7 +128,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
     :return: A list of block strings.
     """
     blocks = []
-    lines = markdown.splitlines()
+    lines = markdown.split("\n")
     current_block: list[str] = []
 
     for line in lines:
@@ -137,7 +137,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
                 blocks.append("\n".join(current_block))
                 current_block = []
         else:
-            current_block.append(line)
+            current_block.append(line.strip())
 
     if current_block:
         blocks.append("\n".join(current_block))
