@@ -93,7 +93,7 @@ class TestParentNode(unittest.TestCase):
         # The props_to_html will include both src and alt, so src will appear twice
         # The implementation adds src manually and then again in props_to_html
         # So the output will be: <img src="image.png" src="image.png" alt="desc">
-        expected_html = '<img src="image.png" src="image.png" alt="desc"/>'
+        expected_html = '<img src="image.png" alt="desc"/>'
         self.assertEqual(node.to_html(), expected_html)
 
 
@@ -117,7 +117,7 @@ class TestLeafNodeImg(unittest.TestCase):
 
     def test_leaf_to_html_img_with_src_and_alt(self):
         node = LeafNode("img", "", props={"src": "cat.png", "alt": "A cat"})
-        expected_html = '<img src="cat.png" src="cat.png" alt="A cat"/>'
+        expected_html = '<img src="cat.png" alt="A cat"/>'
         self.assertEqual(node.to_html(), expected_html)
 
 
@@ -143,7 +143,7 @@ class TestLeafNodeA(unittest.TestCase):
         node = LeafNode(
             "a", "Click here", props={"href": "https://example.com", "target": "_blank"}
         )
-        expected_html = '<a href="https://example.com" href="https://example.com" target="_blank">\
+        expected_html = '<a href="https://example.com" target="_blank">\
 Click here</a>'
         self.assertEqual(node.to_html(), expected_html)
 

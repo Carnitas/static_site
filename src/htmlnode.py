@@ -69,14 +69,11 @@ class LeafNode(HTMLNode):
         if self.tag == "img":
             if not self.props.get("src"):
                 raise ValueError("LeafNode with tag 'img' must have a 'src' attribute.")
-            return f'<{self.tag} src="{self.props["src"]}" {self.props_to_html()}/>'
+            return f"<{self.tag} {self.props_to_html()}/>"
         if self.tag == "a":
             if not self.props.get("href"):
                 raise ValueError("LeafNode with tag 'a' must have an 'href' attribute.")
-            return (
-                f'<{self.tag} href="{self.props["href"]}" '
-                f"{self.props_to_html()}>{self.value}</{self.tag}>"
-            )
+            return f"<{self.tag} {self.props_to_html()}>{self.value}</{self.tag}>"
         return f"<{self.tag}>{self.value}</{self.tag}>"
 
 
