@@ -1,17 +1,13 @@
 import os
 import shutil
 
-from src.generate_content import generate_page
+from src.generate_content import generate_pages_recursive
 
 
 def main() -> None:  # pragma: no cover
     clear_directory("public")
     copy_static_to_public()
-    generate_page(
-        from_path="content/index.md",
-        template_path="template.html",
-        dest_path="public/index.html",
-    )
+    generate_pages_recursive("content", "template.html", "public")
 
 
 def clear_directory(directory: str) -> None:

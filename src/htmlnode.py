@@ -24,7 +24,7 @@ class HTMLNode:
     def to_html(self) -> str:
         raise NotImplementedError
 
-    def props_to_html(self) -> str | None:
+    def props_to_html(self) -> str:
         """
         Convert the properties dictionary to an HTML attribute string.
 
@@ -62,14 +62,21 @@ class LeafNode(HTMLNode):
 
         :return: An HTML string representation of the node.
         """
+        if not self.value and self.tag not in ["img", "a"]:
+            raise ValueError("LeafNode must have a value.")
+        if not self.tag:
+            return self.value or ""
         if self.tag == "img":
             if not self.props.get("src"):
                 raise ValueError("LeafNode with tag 'img' must have a 'src' attribute.")
-            return f'<{self.tag} src="{self.props["src"]}" {self.props_to_html()}>'
-        if not self.value:
-            raise ValueError("LeafNode must have a value.")
-        if not self.tag:
-            return self.value
+            return f'<{self.tag} src="{self.props["src"]}" {self.props_to_html()}/>'
+        if self.tag == "a":
+            if not self.props.get("href"):
+                raise ValueError("LeafNode with tag 'a' must have an 'href' attribute.")
+            return (
+                f'<{self.tag} href="{self.props["href"]}" '
+                f"{self.props_to_html()}>{self.value}</{self.tag}>"
+            )
         return f"<{self.tag}>{self.value}</{self.tag}>"
 
 

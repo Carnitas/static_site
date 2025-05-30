@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 
-from src.generate_content import extract_title, generate_page
+from src.generate_content import extract_title, generate_page, generate_pages_recursive
 
 
 class TestExtractTitle(unittest.TestCase):
@@ -147,6 +147,87 @@ def test_generate_page_replaces_both_placeholders(mock_extract_title, mock_md_to
         assert "Placeholder Title" in content
         assert "<div>HTML</div>" in content
         assert content == "Placeholder Title -- <div>HTML</div>"
+
+
+@mock.patch("src.generate_content.generate_page")
+def test_generate_pages_recursive_single_file(mock_generate_page):
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        content_dir = os.path.join(tmpdir, "content")
+        os.makedirs(content_dir)
+        md_path = os.path.join(content_dir, "page.md")
+        with open(md_path, "w", encoding="utf-8") as f:
+            f.write("# Title\nContent")
+        template_path = os.path.join(tmpdir, "template.html")
+        with open(template_path, "w", encoding="utf-8") as f:
+            f.write("{{ Title }} {{ Content }}")
+        dest_dir = os.path.join(tmpdir, "output")
+
+        generate_pages_recursive(content_dir, template_path, dest_dir)
+
+        # Should call generate_page once with correct paths
+        mock_generate_page.assert_called_once()
+        from_path, tpl_path, dest_path = mock_generate_page.call_args[0]
+        assert from_path == md_path
+        assert tpl_path == template_path
+        assert dest_path == os.path.join(dest_dir, "page.html")
+
+
+@mock.patch("src.generate_content.generate_page")
+def test_generate_pages_recursive_nested_dirs(mock_generate_page):
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        content_dir = os.path.join(tmpdir, "content")
+        os.makedirs(os.path.join(content_dir, "subdir"))
+        md1 = os.path.join(content_dir, "root.md")
+        md2 = os.path.join(content_dir, "subdir", "nested.md")
+        with open(md1, "w", encoding="utf-8") as f:
+            f.write("# Root\nContent")
+        with open(md2, "w", encoding="utf-8") as f:
+            f.write("# Nested\nContent")
+        template_path = os.path.join(tmpdir, "template.html")
+        with open(template_path, "w", encoding="utf-8") as f:
+            f.write("{{ Title }} {{ Content }}")
+        dest_dir = os.path.join(tmpdir, "output")
+
+        generate_pages_recursive(content_dir, template_path, dest_dir)
+
+        # Should call generate_page for both files
+        assert mock_generate_page.call_count == 2
+        called_args = [call[0] for call in mock_generate_page.call_args_list]
+        expected = [
+            (md1, template_path, os.path.join(dest_dir, "root.html")),
+            (md2, template_path, os.path.join(dest_dir, "subdir", "nested.html")),
+        ]
+        for args in expected:
+            assert args in called_args
+
+
+@mock.patch("src.generate_content.generate_page")
+def test_generate_pages_recursive_ignores_non_md(mock_generate_page):
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        content_dir = os.path.join(tmpdir, "content")
+        os.makedirs(content_dir)
+        md_path = os.path.join(content_dir, "file.md")
+        txt_path = os.path.join(content_dir, "file.txt")
+        with open(md_path, "w", encoding="utf-8") as f:
+            f.write("# Title\nContent")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write("Not markdown")
+        template_path = os.path.join(tmpdir, "template.html")
+        with open(template_path, "w", encoding="utf-8") as f:
+            f.write("{{ Title }} {{ Content }}")
+        dest_dir = os.path.join(tmpdir, "output")
+
+        generate_pages_recursive(content_dir, template_path, dest_dir)
+
+        # Only .md file should be processed
+        mock_generate_page.assert_called_once()
+        from_path, tpl_path, dest_path = mock_generate_page.call_args[0]
+        assert from_path == md_path
+        assert tpl_path == template_path
+        assert dest_path == os.path.join(dest_dir, "file.html")
 
 
 if __name__ == "__main__":
