@@ -1,13 +1,15 @@
 import os
 import shutil
+import sys
 
 from src.generate_content import generate_pages_recursive
 
 
 def main() -> None:  # pragma: no cover
-    clear_directory("public")
-    copy_static_to_public()
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+    clear_directory("docs")
+    copy_static_to_docs()
+    generate_pages_recursive("content", "template.html", "docs", basepath=basepath)
 
 
 def clear_directory(directory: str) -> None:
@@ -33,9 +35,9 @@ def copy_directory(src: str, dst: str) -> None:
             print(f"Copied: {s} -> {d}")
 
 
-def copy_static_to_public() -> None:
+def copy_static_to_docs() -> None:
     src = "static"
-    dst = "public"
+    dst = "docs"
     clear_directory(dst)
     copy_directory(src, dst)
 

@@ -18,7 +18,9 @@ def extract_title(markdown: str) -> str:
     raise ValueError("No H1 header found in markdown.")
 
 
-def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
+def generate_page(
+    from_path: str, template_path: str, dest_path: str, basepath: str = "/"
+) -> None:
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     # Read markdown content
@@ -36,8 +38,11 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
     title = extract_title(markdown_content)
 
     # Replace placeholders
-    page_content = template_content.replace("{{ Title }}", title).replace(
-        "{{ Content }}", html_content
+    page_content = (
+        template_content.replace("{{ Title }}", title)
+        .replace("{{ Content }}", html_content)
+        .replace('src="/', f'src="{basepath}')
+        .replace('href="/', f'href="{basepath}')
     )
 
     # Ensure destination directory exists
@@ -49,7 +54,7 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
 
 
 def generate_pages_recursive(
-    dir_path_content: str, template_path: str, dest_dir_path: str
+    dir_path_content: str, template_path: str, dest_dir_path: str, basepath: str = "/"
 ) -> None:
     """
     Recursively generate pages from markdown files in a directory.
@@ -66,4 +71,4 @@ def generate_pages_recursive(
                 dest_path = os.path.join(
                     dest_dir_path, relative_path.replace(".md", ".html")
                 )
-                generate_page(from_path, template_path, dest_path)
+                generate_page(from_path, template_path, dest_path, basepath=basepath)
