@@ -1,9 +1,47 @@
-from src.textnode import TextNode
+import os
+import shutil
+
+from src.generate_content import generate_page
 
 
 def main() -> None:  # pragma: no cover
-    first_text_node = TextNode("This is some text", "link", "https://example.com")
-    print(first_text_node)
+    clear_directory("public")
+    copy_static_to_public()
+    generate_page(
+        from_path="content/index.md",
+        template_path="template.html",
+        dest_path="public/index.html",
+    )
+
+
+def clear_directory(directory: str) -> None:
+    if os.path.exists(directory):
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+
+
+def copy_directory(src: str, dst: str) -> None:
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            copy_directory(s, d)
+        else:
+            shutil.copy2(s, d)
+            print(f"Copied: {s} -> {d}")
+
+
+def copy_static_to_public() -> None:
+    src = "static"
+    dst = "public"
+    clear_directory(dst)
+    copy_directory(src, dst)
 
 
 if __name__ == "__main__":

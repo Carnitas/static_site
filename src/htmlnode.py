@@ -62,6 +62,10 @@ class LeafNode(HTMLNode):
 
         :return: An HTML string representation of the node.
         """
+        if self.tag == "img":
+            if not self.props.get("src"):
+                raise ValueError("LeafNode with tag 'img' must have a 'src' attribute.")
+            return f'<{self.tag} src="{self.props["src"]}" {self.props_to_html()}>'
         if not self.value:
             raise ValueError("LeafNode must have a value.")
         if not self.tag:

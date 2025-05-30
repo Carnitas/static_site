@@ -79,3 +79,26 @@ class TestHTMLNode(unittest.TestCase):
             parent_node.to_html(),
             "<div><span><b>grandchild</b></span></div>",
         )
+
+    def test_leaf_img_with_src(self) -> None:
+        node = LeafNode("img", "", props={"src": "image.png", "alt": "desc"})
+        # The props_to_html will include both src and alt, so src will appear twice
+        # The implementation adds src manually and then again in props_to_html
+        # So the output will be: <img src="image.png" src="image.png" alt="desc">
+        expected_html = '<img src="image.png" src="image.png" alt="desc">'
+        self.assertEqual(node.to_html(), expected_html)
+
+    def test_leaf_img_without_src(self) -> None:
+        node = LeafNode("img", "", props={"alt": "desc"})
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_leaf_img_with_empty_props(self) -> None:
+        node = LeafNode("img", "", props={})
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_leaf_img_with_none_props(self) -> None:
+        node = LeafNode("img", "", props=None)
+        with self.assertRaises(ValueError):
+            node.to_html()

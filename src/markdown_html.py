@@ -18,15 +18,15 @@ def markdown_to_html_node(markdown: str) -> HTMLNode:
         block_type = block_to_block_type(block)
         if block_type == BlockType.PARAGRAPH:
             parent_node.children.append(handle_paragraph(block))
-        elif block_type == BlockType.HEADING:
+        if block_type == BlockType.HEADING:
             parent_node.children.extend(handle_heading(block))
-        elif block_type == BlockType.CODE:
+        if block_type == BlockType.CODE:
             parent_node.children.append(handle_code(block))
-        elif block_type == BlockType.QUOTE:
+        if block_type == BlockType.QUOTE:
             parent_node.children.append(handle_quote(block))
-        elif block_type == BlockType.ORDERED_LIST:
+        if block_type == BlockType.ORDERED_LIST:
             parent_node.children.append(handle_ordered_list(block))
-        elif block_type == BlockType.UNORDERED_LIST:
+        if block_type == BlockType.UNORDERED_LIST:
             parent_node.children.append(handle_unordered_list(block))
 
     return parent_node
