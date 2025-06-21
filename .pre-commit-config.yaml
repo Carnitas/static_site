@@ -93,7 +93,7 @@ repos:
     hooks:
       - id: yesqa
         additional_dependencies:
-          - flake8==7.2.0
+          - flake8==7.3.0
           - flake8-2020
           - flake8-bugbear
           - flake8-builtins
@@ -105,7 +105,7 @@ repos:
           - flake8-simplify
           - flake8-tidy-imports
   - repo: https://github.com/pycqa/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         additional_dependencies:
