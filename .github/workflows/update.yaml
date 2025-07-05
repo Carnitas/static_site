@@ -42,5 +42,5 @@ jobs:
           title: ':arrow_up: Update dependencies'
           branch: update-python-${{ needs.date.outputs.date }}
           base: main
-          reviewers: jgopel
+          reviewers: carnitas
           labels: enhancement
