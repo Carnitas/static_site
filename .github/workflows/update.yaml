@@ -36,7 +36,7 @@ jobs:
       - run: poetry update --no-interaction -vvv
       - run: poetry run pre-commit autoupdate
 
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           commit-message: ':arrow_up: Update dependencies'
           title: ':arrow_up: Update dependencies'
